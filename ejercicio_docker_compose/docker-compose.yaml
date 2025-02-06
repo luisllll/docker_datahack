@@ -1,0 +1,40 @@
+
+
+services:
+  postgres:
+    image: postgres:14 #indico la version de la imagen a descargar
+    container_name: postgres_luis_compose
+    environment: #aplico variables configuracion  de postgres
+      POSTGRES_USER: luis
+      POSTGRES_PASSWORD: luis01
+      POSTGRES_DB: master
+    ports: #indico el puerto de escucha
+      - "5432:5432"
+    volumes: #indico el volumen para la persistencia de datos
+      - postgres_data:/var/lib/postgresql/data
+    networks: #se indica el network para que los servicios se conecten
+      - network_luis_compose
+
+  myapp:
+    image: lullll/app_luis:latest #usamos la imagen alojada en docker hub
+    container_name: app_luis_compose
+    environment: 
+      DB_HOST: postgres_luis_compose
+      DB_PORT: 5432
+      DB_NAME: master
+      DB_USER: luis
+      DB_PASSWORD: luis01
+      VERSION: "0.0.0-lll"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - network_luis_compose
+
+volumes:
+  postgres_data:
+
+networks:
+  network_luis_compose:
+    driver: bridge
