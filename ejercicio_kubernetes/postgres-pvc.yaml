@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc # Nombre del PVC que se usará en el despliegue
+  namespace: app-luis # Namespace donde se creará el PVC
+spec:
+  accessModes:
+    - ReadWriteOnce # Permite un solo nodo de lectura/escritura a la vez
+  resources:
+    requests:
+      storage: 1Gi # Solicita 1 GB de almacenamiento persistente

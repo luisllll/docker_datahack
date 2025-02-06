@@ -1,0 +1,50 @@
+# Deployment para la aplicación Flask
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-deployment # Nombre del Deployment
+  namespace: app-luis    # Namespace donde se desplegará
+spec:
+  replicas: 1 # Cantidad de Pods a ejecutar
+  selector:
+    matchLabels:
+      app: flask # Selector para asociar Pods
+  template:
+    metadata:
+      labels:
+        app: flask # Etiqueta que identifica este Pod
+    spec:
+      containers:
+        - name: flask-app
+          image: lullll/app_luis:latest # Imagen de la aplicación alojada en docker hub
+          ports:
+            - containerPort: 5000 # Puerto en el contenedor donde Flask escucha
+          env: # Variables de entorno para conectar Flask a PostgreSQL
+            - name: DB_HOST
+              value: "postgres-service" # Nombre del servicio de PostgreSQL
+            - name: DB_PORT
+              value: "5432" # Puerto donde PostgreSQL escucha
+            - name: DB_NAME
+              value: "master"
+            - name: DB_USER
+              value: "luis"
+            - name: DB_PASSWORD
+              value: "luis01"
+            - name: VERSION
+              value: "0.0.0-lll" # Versión configurada de la aplicación Flask
+
+---
+# Service para la aplicación Flask
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-service # Nombre del servicio Flask
+  namespace: app-luis # Namespace donde se desplegará
+spec:
+  selector:
+    app: flask # Selecciona los Pods con esta etiqueta
+  ports:
+    - protocol: TCP
+      port: 5000      # Puerto expuesto por el servicio
+      targetPort: 5000 # Puerto en el contenedor
+  type: NodePort # Expone el servicio fuera del clúster usando un NodePort
